@@ -24,8 +24,8 @@ public class Simulation {
         double insp_lambda2 = 0.06436289;
         double insp_lambda3 = 0.0484667;
 
-        Thread insp1 = new Thread(new Inspector(1, seed1, insp_lambda1, work1, work2, work3), "Inspector1");
-        Thread insp2 = new Thread(new Inspector2(2, seed2, insp_lambda2, insp_lambda3, work1, work2, work3), "Inspector2");
+        Thread insp1 = new Thread(new Inspector(1, seed1, insp_lambda1,insp_lambda2, insp_lambda3, work1, work2, work3), "Inspector1");
+        Thread insp2 = new Thread(new Inspector(2, seed2, insp_lambda1,insp_lambda2, insp_lambda3, work1, work2, work3), "Inspector2");
 
         threadWork1.start();
         threadWork2.start();

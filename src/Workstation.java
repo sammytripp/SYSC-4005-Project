@@ -73,7 +73,7 @@ public class Workstation implements Runnable{
         C3Buffer = c3Buffer;
     }
 
-    public Product buildProduct(){
+    public synchronized Product buildProduct(){
         switch(type) {
             case ONE:
                 if(C1Buffer.size() > 0){
