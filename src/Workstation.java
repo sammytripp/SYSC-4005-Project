@@ -1,11 +1,9 @@
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Workstation implements Runnable{
+public class Workstation implements Runnable {
 
-    enum Type{
-        ONE, TWO, THREE
-    };
+    enum Type { ONE, TWO, THREE }
 
     private static final int BUFFER_SIZE = 2;
 
@@ -13,32 +11,33 @@ public class Workstation implements Runnable{
     private ArrayList<Component> C1Buffer;
     private ArrayList<Component> C2Buffer;
     private ArrayList<Component> C3Buffer;
-    protected double lambda;
     private Type type;
-    private Random rand;
+    private final Random rand;
+    private double lambda;
+    private long processingTime = 0;
 
 
-    public Workstation(int id, double lambda) {
+
+    public Workstation(int id, double lambda, long seed) {
         this.id = id;
         this.lambda = lambda;
         type = Type.ONE;
-        C1Buffer = new ArrayList<Component>();
-        rand = new Random();
-
+        C1Buffer = new ArrayList<>();
+        rand = new Random(seed);
     }
 
-    public Workstation(int id, double lambda, boolean c2) {
+    public Workstation(int id, double lambda, long seed, boolean c2) {
         this.id = id;
         this.lambda = lambda;
-        C1Buffer = new ArrayList<Component>();
+        C1Buffer = new ArrayList<>();
         if (c2) {
-            C2Buffer = new ArrayList<Component>();
+            C2Buffer = new ArrayList<>();
             type = Type.TWO;
         } else {
-            C3Buffer = new ArrayList<Component>();
+            C3Buffer = new ArrayList<>();
             type = Type.THREE;
         }
-        rand = new Random();
+        rand = new Random(seed);
     }
 
     public int getId() { return id; }
@@ -76,24 +75,24 @@ public class Workstation implements Runnable{
     public synchronized Product buildProduct(){
         switch(type) {
             case ONE:
-                if(C1Buffer.size() > 0){
-                    C1Buffer.remove(1);
+                if(C1Buffer.size() > 0) {
+                    C1Buffer.remove(0);
                     System.out.println("Built product 1");
                     return new Product(Product.Type.ONE);
                 }
                 break;
             case TWO:
-                if(C1Buffer.size() > 0 && C2Buffer.size() > 0){
-                    C1Buffer.remove(1);
-                    C2Buffer.remove(1);
+                if(C1Buffer.size() > 0 && C2Buffer.size() > 0) {
+                    C1Buffer.remove(0);
+                    C2Buffer.remove(0);
                     System.out.println("Built product 2");
                     return new Product(Product.Type.TWO);
                 }
                 break;
             case THREE:
-                if(C1Buffer.size() > 0 && C3Buffer.size() > 0){
-                    C1Buffer.remove(1);
-                    C3Buffer.remove(1);
+                if(C1Buffer.size() > 0 && C3Buffer.size() > 0) {
+                    C1Buffer.remove(0);
+                    C3Buffer.remove(0);
                     System.out.println("Built product 3");
                     return new Product(Product.Type.THREE);
                 }
@@ -109,19 +108,19 @@ public class Workstation implements Runnable{
 
     /**
      * Adds component to the queue. Is thread safe, no protection needed
-     * @param comp
+     * @param comp Component
      * @return True if added successfully
      */
     public synchronized boolean add(Component comp){
-        if(comp.getType() == Component.Type.ONE && C1Buffer.size() < 2){
+        if(comp.getType() == Component.Type.ONE && C1Buffer.size() < BUFFER_SIZE){
             C1Buffer.add(comp);
             return true;
         }
-        if(comp.getType() == Component.Type.TWO && C2Buffer.size() < 2){
+        if(comp.getType() == Component.Type.TWO && C2Buffer.size() < BUFFER_SIZE){
             C2Buffer.add(comp);
             return true;
         }
-        if(comp.getType() == Component.Type.THREE && C3Buffer.size() < 2){
+        if(comp.getType() == Component.Type.THREE && C3Buffer.size() < BUFFER_SIZE){
             C3Buffer.add(comp);
             return true;
         }
@@ -131,15 +130,33 @@ public class Workstation implements Runnable{
 
     @Override
     public void run() {
+        while (true) {
+//            System.out.println("workstation : " + id);
+            Product currentProd = buildProduct();
+            long startingSystemTime = System.currentTimeMillis();
 
-        System.out.println("workstation : " + id);
+            while(currentProd == null) {
+                // Necessary components not present in buffer(s)
+                try {
+                    Thread.sleep(1000);
+                    System.out.println("workstation : " + id + " blocked");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                currentProd = buildProduct();
+            }
+            // Product processing successful
+            double serviceTime = wsServiceTime();
+            try {
+                Thread.sleep(1000);
+                Thread.sleep((long) serviceTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        /*
-        try {
-            Thread.sleep((long) serviceTime);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            processingTime += System.currentTimeMillis() - startingSystemTime;
+            System.out.println("workstation : " + id + " || service time : " + serviceTime + " || prod : " + currentProd.getType());
         }
-        */
+
     }
 }

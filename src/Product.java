@@ -1,11 +1,7 @@
 public class Product {
-    enum Type{
-        ONE, TWO, THREE
-    };
+    enum Type { ONE, TWO, THREE }
 
     private Type type;
-
-    public Product(){ }
 
     public Product(Type type){
         this.type = type;

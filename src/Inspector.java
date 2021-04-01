@@ -6,15 +6,12 @@ public class Inspector implements Runnable{
     private Workstation work2;
     private Workstation work3;
     private Random rand;
-    private Random randomComponentgenerator;
+    private Random randomComponentGenerator;
     private double lambda1;
     private double lambda2;
     private double lambda3;
     private long blockedTime = 0;
     private int currentWorkstation = 1;
-
-    public Inspector(){
-    }
 
     public Inspector(int id, long seed, double lambda1, double lambda2, double lambda3, Workstation work1, Workstation work2, Workstation work3){
         this.id = id;
@@ -25,17 +22,19 @@ public class Inspector implements Runnable{
         this.lambda2 = lambda2;
         this.lambda3 = lambda3;
         rand = new Random(seed);
-        randomComponentgenerator = new Random();
+        randomComponentGenerator = new Random();
     }
 
     public Component generateComponent(){
         if (id == 2) {
-            if(randomComponentgenerator.nextBoolean()) {
+            // Inspector 2 generates components 2 and 3
+            if(randomComponentGenerator.nextBoolean()) {
                 return new Component(Component.Type.TWO);
             }else {
                 return new Component(Component.Type.THREE);
             }
         } else {
+            // Inspector 1 generates component 1
             return new Component(Component.Type.ONE);
         }
     }
@@ -92,9 +91,9 @@ public class Inspector implements Runnable{
 
             System.out.println("inspector : " + id + " || service time : " + serviceTime + " || comp : " + currentComp.getType());
 
-            long startingsystemTime = System.currentTimeMillis();
+            long startingSystemTime = System.currentTimeMillis();
             while (!addToWorkstation(currentComp)){
-                // temporary to avoid flooding output
+                // Temporary to avoid flooding output
                 try {
                     Thread.sleep(1000);
                     System.out.println("inspector : " + id + " blocked");
@@ -103,9 +102,8 @@ public class Inspector implements Runnable{
                 }
 //                blockedTime
             }
-            blockedTime += System.currentTimeMillis() - startingsystemTime;
+            blockedTime += System.currentTimeMillis() - startingSystemTime;
             currentWorkstation = currentWorkstation % 3 + 1;
-
 
 //            System.out.println("inspector : " + id + " workstation : " + currentWorkstation);
         }

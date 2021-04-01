@@ -1,8 +1,6 @@
 public class Component {
 
-    enum Type {
-        ONE, TWO, THREE
-    };
+    enum Type { ONE, TWO, THREE }
 
     private Type type;
 
