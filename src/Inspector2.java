@@ -11,14 +11,14 @@ public class Inspector2 extends Inspector{
 
 
     public double calculateNextServiceTime(Component comp){
-        double temp = (comp.type == Component.Type.TWO) ? lambda : lambda3;
+        double temp = (comp.getType() == Component.Type.TWO) ? lambda : lambda3;
         double r = rand.nextDouble();
         return - (1/temp) * Math.log(1-r); // inverse CDF
     }
 
 
     public boolean addToWorkstation(Component comp){
-        switch (comp.type) {
+        switch (comp.getType()) {
             case TWO:
                 return work2.add(comp);
             case THREE:
@@ -32,8 +32,7 @@ public class Inspector2 extends Inspector{
     public void run() {
         System.out.println("inspector : " + id);
 
-        // generate rando component
-
+        // generate random component
         double serviceTime = calculateNextServiceTime();
 
         try {

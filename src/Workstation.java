@@ -2,28 +2,47 @@ import java.util.ArrayList;
 
 public class Workstation implements Runnable{
 
+    enum Type{
+        ONE, TWO, THREE
+    };
+
+    private static final int BUFFER_SIZE = 2;
+
     private int id;
     private ArrayList<Component> C1Buffer;
     private ArrayList<Component> C2Buffer;
     private ArrayList<Component> C3Buffer;
+    protected double lambda;
+    private Type type;
 
-    private Workstation(){
 
-    }
-
-    public Workstation(int id){
-
+    public Workstation(int id, double lambda) {
         this.id = id;
+        this.lambda = lambda;
+        type = Type.ONE;
         C1Buffer = new ArrayList<Component>();
     }
 
-    public int getId() {
-        return id;
+    public Workstation(int id, double lambda, boolean c2) {
+        this.id = id;
+        this.lambda = lambda;
+        C1Buffer = new ArrayList<Component>();
+        if (c2) {
+            C2Buffer = new ArrayList<Component>();
+            type = Type.TWO;
+        } else {
+            C3Buffer = new ArrayList<Component>();
+            type = Type.THREE;
+        }
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
+
+    public Type getType() { return type; }
+
+    public void setType(Type type) { this.type = type; }
 
     public ArrayList<Component> getC1Buffer() {
         return C1Buffer;
@@ -49,22 +68,31 @@ public class Workstation implements Runnable{
         C3Buffer = c3Buffer;
     }
 
-    public Product.Type buildProduct(){
-        Product p = new Product();
-        if(C1Buffer.size() > 0){
-            C1Buffer.remove(1);
-            return Product.Type.ONE;
-        }
-        if(C1Buffer.size() > 0 && C2Buffer.size() > 0){
-            C1Buffer.remove(1);
-            C2Buffer.remove(1);
-            return Product.Type.TWO;
-        }
-        if(C1Buffer.size() > 0 && C3Buffer.size() > 0){
-            C1Buffer.remove(1);
-            C3Buffer.remove(1);
-            return Product.Type.THREE;
-
+    public Product buildProduct(){
+        switch(type) {
+            case ONE:
+                if(C1Buffer.size() > 0){
+                    C1Buffer.remove(1);
+                    System.out.println("Built product 1");
+                    return new Product(Product.Type.ONE);
+                }
+                break;
+            case TWO:
+                if(C1Buffer.size() > 0 && C2Buffer.size() > 0){
+                    C1Buffer.remove(1);
+                    C2Buffer.remove(1);
+                    System.out.println("Built product 2");
+                    return new Product(Product.Type.TWO);
+                }
+                break;
+            case THREE:
+                if(C1Buffer.size() > 0 && C3Buffer.size() > 0){
+                    C1Buffer.remove(1);
+                    C3Buffer.remove(1);
+                    System.out.println("Built product 3");
+                    return new Product(Product.Type.THREE);
+                }
+                break;
         }
         return null;
     }
@@ -80,6 +108,15 @@ public class Workstation implements Runnable{
 
     @Override
     public void run() {
+
         System.out.println("workstation : " + id);
+
+        /*
+        try {
+            Thread.sleep((long) serviceTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        */
     }
 }

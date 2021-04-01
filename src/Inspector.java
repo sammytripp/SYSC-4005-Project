@@ -60,7 +60,7 @@ public class Inspector implements Runnable{
             currentWorkstation = currentWorkstation % 3 + 1;
 
 
-            System.out.println("inspector : " + id + " workstaion : " + currentWorkstation);
+            System.out.println("inspector : " + id + " workstation : " + currentWorkstation);
         }
     }
 }

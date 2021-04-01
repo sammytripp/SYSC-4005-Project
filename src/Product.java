@@ -3,13 +3,15 @@ public class Product {
         ONE, TWO, THREE
     };
 
-    public Product.Type type;
+    private Type type;
 
-    public Product(){
+    public Product(){ }
 
-    }
-
-    public Product(Product.Type type){
+    public Product(Type type){
         this.type = type;
     }
+
+    public void setType(Type type) { this.type = type; }
+
+    public Type getType() { return type; }
 }
