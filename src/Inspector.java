@@ -11,7 +11,6 @@ public class Inspector implements Runnable{
     private double lambda2;
     private double lambda3;
     private long blockedTime = 0;
-    private int currentWorkstation = 1;
 
     public Inspector(int id, long seed, double lambda1, double lambda2, double lambda3, Workstation work1, Workstation work2, Workstation work3){
         this.id = id;
@@ -53,15 +52,19 @@ public class Inspector implements Runnable{
     }
 
     public boolean addToWorkstation(Component comp){
+        // Buffer with fewest components is highest priority
+        int numComponents1 = work1.getC1Buffer().size();
+        int numComponents2 = work2.getC2Buffer().size();
+        int numComponents3 = work3.getC3Buffer().size();
+
         if (id == 1) {
-            switch (currentWorkstation) {
-                case 1:
-                    return work1.add(comp);
-                case 2:
-                    return work2.add(comp);
-                case 3:
-                    return work3.add(comp);
-            }
+            if (numComponents1 == 0) { return work1.add(comp); }
+            if (numComponents2 == 0) { return work2.add(comp); }
+            if (numComponents3 == 0) { return work3.add(comp); }
+            if (numComponents1 == 1) { return work1.add(comp); }
+            if (numComponents2 == 1) { return work2.add(comp); }
+            if (numComponents3 == 1) { return work3.add(comp); }
+
         } else if (id == 2) {
             switch (comp.getType()) {
                 case TWO:
@@ -83,7 +86,6 @@ public class Inspector implements Runnable{
             double serviceTime = calculateNextServiceTime(currentComp);
 
             try {
-                Thread.sleep(1000);
                 Thread.sleep((long) serviceTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -93,19 +95,10 @@ public class Inspector implements Runnable{
 
             long startingSystemTime = System.currentTimeMillis();
             while (!addToWorkstation(currentComp)){
-                // Temporary to avoid flooding output
-                try {
-                    Thread.sleep(1000);
-                    System.out.println("inspector : " + id + " blocked");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-//                blockedTime
+                // Blocked
             }
             blockedTime += System.currentTimeMillis() - startingSystemTime;
-            currentWorkstation = currentWorkstation % 3 + 1;
 
-//            System.out.println("inspector : " + id + " workstation : " + currentWorkstation);
         }
     }
 }

@@ -15,6 +15,7 @@ public class Workstation implements Runnable {
     private final Random rand;
     private double lambda;
     private long processingTime = 0;
+    private int totalProducts = 0;
 
 
 
@@ -137,24 +138,18 @@ public class Workstation implements Runnable {
 
             while(currentProd == null) {
                 // Necessary components not present in buffer(s)
-                try {
-                    Thread.sleep(1000);
-                    System.out.println("workstation : " + id + " blocked");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 currentProd = buildProduct();
             }
             // Product processing successful
             double serviceTime = wsServiceTime();
             try {
-                Thread.sleep(1000);
                 Thread.sleep((long) serviceTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+            totalProducts += 1;
             processingTime += System.currentTimeMillis() - startingSystemTime;
+
             System.out.println("workstation : " + id + " || service time : " + serviceTime + " || prod : " + currentProd.getType());
         }
 
