@@ -103,6 +103,18 @@ public class Workstation implements Runnable{
      * @return True if added successfully
      */
     public synchronized boolean add(Component comp){
+        if(comp.getType() == Component.Type.ONE && C1Buffer.size() < 2){
+            C1Buffer.add(comp);
+            return true;
+        }
+        if(comp.getType() == Component.Type.TWO && C2Buffer.size() < 2){
+            C2Buffer.add(comp);
+            return true;
+        }
+        if(comp.getType() == Component.Type.THREE && C3Buffer.size() < 2){
+            C3Buffer.add(comp);
+            return true;
+        }
         return false;
     }
 
