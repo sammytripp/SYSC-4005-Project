@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Workstation implements Runnable{
 
@@ -14,6 +15,7 @@ public class Workstation implements Runnable{
     private ArrayList<Component> C3Buffer;
     protected double lambda;
     private Type type;
+    private Random rand;
 
 
     public Workstation(int id, double lambda) {
@@ -21,6 +23,8 @@ public class Workstation implements Runnable{
         this.lambda = lambda;
         type = Type.ONE;
         C1Buffer = new ArrayList<Component>();
+        rand = new Random();
+
     }
 
     public Workstation(int id, double lambda, boolean c2) {
@@ -34,6 +38,7 @@ public class Workstation implements Runnable{
             C3Buffer = new ArrayList<Component>();
             type = Type.THREE;
         }
+        rand = new Random();
     }
 
     public int getId() { return id; }
@@ -97,6 +102,11 @@ public class Workstation implements Runnable{
         return null;
     }
 
+    public double wsServiceTime(){
+        double r = rand.nextDouble();
+        return - (1/lambda) * Math.log(1-r); // inverse CDF
+    }
+
     /**
      * Adds component to the queue. Is thread safe, no protection needed
      * @param comp
@@ -117,6 +127,7 @@ public class Workstation implements Runnable{
         }
         return false;
     }
+
 
     @Override
     public void run() {
