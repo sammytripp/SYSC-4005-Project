@@ -1,5 +1,7 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.FileWriter;
 
 public class Workstation implements Runnable {
 
@@ -131,7 +133,9 @@ public class Workstation implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        long simStart = System.currentTimeMillis();
+        ArrayList serviceTimes = new ArrayList<Double>();
+        while (System.currentTimeMillis() - simStart < 480) {
 //            System.out.println("workstation : " + id);
             Product currentProd = buildProduct();
             long startingSystemTime = System.currentTimeMillis();
@@ -142,6 +146,7 @@ public class Workstation implements Runnable {
             }
             // Product processing successful
             double serviceTime = wsServiceTime();
+            serviceTimes.add(serviceTime);
             try {
                 Thread.sleep((long) serviceTime);
             } catch (InterruptedException e) {
@@ -152,6 +157,20 @@ public class Workstation implements Runnable {
 
             System.out.println("workstation : " + id + " || service time : " + serviceTime + " || prod : " + currentProd.getType());
         }
+        System.out.println("workstation : " + id + " is done, elapsed time : " + (System.currentTimeMillis() - simStart) +"ms");
 
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter("Workstation"+id+".txt" );
+            writer.write("Service times of Workstation "+id+ System.lineSeparator()) ;
+            for(Object dd: serviceTimes) {
+                writer.write(dd + System.lineSeparator());
+            }
+            writer.write("Total items produced : " + totalProducts + System.lineSeparator()) ;
+            writer.write("Total elapsed time : " + (System.currentTimeMillis() - simStart) + System.lineSeparator()) ;
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

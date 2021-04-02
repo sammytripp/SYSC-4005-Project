@@ -1,4 +1,8 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
+import java.io.FileWriter;
 
 public class Inspector implements Runnable{
     private int id;
@@ -78,13 +82,14 @@ public class Inspector implements Runnable{
 
     @Override
     public void run() {
-        while (true) {
-//            System.out.println("inspector : " + id);
+        ArrayList serviceTimes = new ArrayList<String>();
+        long simStart = System.currentTimeMillis();
 
+        while (System.currentTimeMillis() - simStart < 480) {
             Component currentComp = generateComponent();
 
             double serviceTime = calculateNextServiceTime(currentComp);
-
+            serviceTimes.add(currentComp.getType() + ", " + serviceTime);
             try {
                 Thread.sleep((long) serviceTime);
             } catch (InterruptedException e) {
@@ -94,11 +99,25 @@ public class Inspector implements Runnable{
             System.out.println("inspector : " + id + " || service time : " + serviceTime + " || comp : " + currentComp.getType());
 
             long startingSystemTime = System.currentTimeMillis();
-            while (!addToWorkstation(currentComp)){
-                // Blocked
-            }
-            blockedTime += System.currentTimeMillis() - startingSystemTime;
+            while (!addToWorkstation(currentComp)) {
 
+            }
+            blockedTime = System.currentTimeMillis() - startingSystemTime;
+
+
+            FileWriter writer = null;
+            try {
+                writer = new FileWriter("Inspector" + id + ".txt");
+                writer.write("Service times of Inspector " + id + System.lineSeparator());
+                for (Object dd : serviceTimes) {
+                    writer.write(dd + System.lineSeparator());
+                }
+//                writer.write("Total blocked time : " + blockedTime + System.lineSeparator());
+                writer.write("Total elapsed time : " + (System.currentTimeMillis() - simStart) + System.lineSeparator()) ;
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

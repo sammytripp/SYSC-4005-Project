@@ -21,8 +21,8 @@ public class Simulation {
         Thread threadWork3 = new Thread(work3, "Workstation3");
 
         // Initialize the inspector values
-        long seed1 = 1;
-        long seed2 = 2;
+        long seed1 = 100;
+        long seed2 = 200;
         double lambda1 = 0.096544573;
         double lambda2 = 0.06436289;
         double lambda3 = 0.0484667;
