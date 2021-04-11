@@ -26,7 +26,7 @@ public class Workstation implements Runnable {
         this.lambda = lambda;
         type = Type.ONE;
         C1Buffer = new ArrayList<>();
-        rand = new Random(seed);
+        rand = new Random();
     }
 
     public Workstation(int id, double lambda, long seed, boolean c2) {
@@ -40,7 +40,7 @@ public class Workstation implements Runnable {
             C3Buffer = new ArrayList<>();
             type = Type.THREE;
         }
-        rand = new Random(seed);
+        rand = new Random();
     }
 
     public int getId() { return id; }
@@ -80,7 +80,7 @@ public class Workstation implements Runnable {
             case ONE:
                 if(C1Buffer.size() > 0) {
                     C1Buffer.remove(0);
-                    System.out.println("Built product 1");
+                    System.out.println("Built product 1 - workstation: " + id);
                     return new Product(Product.Type.ONE);
                 }
                 break;
@@ -88,7 +88,7 @@ public class Workstation implements Runnable {
                 if(C1Buffer.size() > 0 && C2Buffer.size() > 0) {
                     C1Buffer.remove(0);
                     C2Buffer.remove(0);
-                    System.out.println("Built product 2");
+                    System.out.println("Built product 2 - workstation: " + id);
                     return new Product(Product.Type.TWO);
                 }
                 break;
@@ -96,7 +96,7 @@ public class Workstation implements Runnable {
                 if(C1Buffer.size() > 0 && C3Buffer.size() > 0) {
                     C1Buffer.remove(0);
                     C3Buffer.remove(0);
-                    System.out.println("Built product 3");
+                    System.out.println("Built product 3 - workstation: " + id);
                     return new Product(Product.Type.THREE);
                 }
                 break;
@@ -140,7 +140,7 @@ public class Workstation implements Runnable {
             Product currentProd = buildProduct();
             long startingSystemTime = System.currentTimeMillis();
 
-            while(currentProd == null) {
+            while (currentProd == null) {
                 // Necessary components not present in buffer(s)
                 currentProd = buildProduct();
             }
@@ -156,21 +156,22 @@ public class Workstation implements Runnable {
             processingTime += System.currentTimeMillis() - startingSystemTime;
 
             System.out.println("workstation : " + id + " || service time : " + serviceTime + " || prod : " + currentProd.getType());
-        }
-        System.out.println("workstation : " + id + " is done, elapsed time : " + (System.currentTimeMillis() - simStart) +"ms");
 
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter("Workstation"+id+".txt" );
-            writer.write("Service times of Workstation "+id+ System.lineSeparator()) ;
-            for(Object dd: serviceTimes) {
-                writer.write(dd + System.lineSeparator());
+            System.out.println("workstation : " + id + " is done, elapsed time : " + (System.currentTimeMillis() - simStart) + "ms");
+
+            FileWriter writer = null;
+            try {
+                writer = new FileWriter("Workstation" + id + ".txt");
+                writer.write("Service times of Workstation " + id + System.lineSeparator());
+                for (Object dd : serviceTimes) {
+                    writer.write(dd + System.lineSeparator());
+                }
+                writer.write("Total items produced : " + totalProducts + System.lineSeparator());
+                writer.write("Total elapsed time : " + (System.currentTimeMillis() - simStart) + System.lineSeparator());
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            writer.write("Total items produced : " + totalProducts + System.lineSeparator()) ;
-            writer.write("Total elapsed time : " + (System.currentTimeMillis() - simStart) + System.lineSeparator()) ;
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

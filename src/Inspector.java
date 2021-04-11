@@ -24,7 +24,7 @@ public class Inspector implements Runnable{
         this.lambda1 = lambda1;
         this.lambda2 = lambda2;
         this.lambda3 = lambda3;
-        rand = new Random(seed);
+        rand = new Random();
         randomComponentGenerator = new Random();
     }
 
@@ -58,16 +58,16 @@ public class Inspector implements Runnable{
     public boolean addToWorkstation(Component comp){
         // Buffer with fewest components is highest priority
         int numComponents1 = work1.getC1Buffer().size();
-        int numComponents2 = work2.getC2Buffer().size();
-        int numComponents3 = work3.getC3Buffer().size();
+        int numComponents2 = work2.getC1Buffer().size();
+        int numComponents3 = work3.getC1Buffer().size();
 
         if (id == 1) {
-            if (numComponents1 == 0) { return work1.add(comp); }
             if (numComponents2 == 0) { return work2.add(comp); }
             if (numComponents3 == 0) { return work3.add(comp); }
-            if (numComponents1 == 1) { return work1.add(comp); }
             if (numComponents2 == 1) { return work2.add(comp); }
             if (numComponents3 == 1) { return work3.add(comp); }
+            if (numComponents1 == 0) { return work1.add(comp); }
+            if (numComponents1 == 1) { return work1.add(comp); }
 
         } else if (id == 2) {
             switch (comp.getType()) {
